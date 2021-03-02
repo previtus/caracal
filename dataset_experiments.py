@@ -14,6 +14,8 @@ import pylab as plt
 import numpy as np
 from matplotlib.patches import Rectangle
 
+from scipy.io import wavfile
+
 def mkdir(folder):
     if not os.path.exists(folder):
         os.makedirs(folder)
@@ -35,7 +37,7 @@ def draw_bboxes_for_events(events, ax, boolean_mask=None):
         # In plot coordinates
         t_start_orig = events[event_i].event_time
         t_end_orig = t_start_orig + events[event_i].event_length
-        print(t_start_orig, t_end_orig)
+        #print(t_start_orig, t_end_orig)
 
         # In data coordinates
         # t_start = int( events[event_i].event_time*Fs )
@@ -111,7 +113,7 @@ def extract_events_data_from_dataset(logger, coarse_timestamp, strong_coherence_
     final_non_events = [non_events[i] for i in range(len(non_events)) if nonoverlapping_nonevent_flags[i]]
 
     print("We got", len(events), "events.")
-    print("And", len(final_non_events), "non-events.")
+    print("And", len(final_non_events), "non-events which weren't overlapping.")
     return events, final_non_events
 
 def visualize_events_nonevents(logger, coarse_timestamp, events, non_events, show=False, save=None):
@@ -145,13 +147,44 @@ def visualize_events_nonevents(logger, coarse_timestamp, events, non_events, sho
     # plt.figure(figsize=(8, 6), dpi=180)
     # viz.plotSpectrolines(rawAudio,spacing=0.05,low_band=10,high_band=200,step=2)
     # plt.show()
+    plt.close()
 
+def save_audio_samples(events, directory):
+    if len(events) == 0:
+        return None
+
+    viz = audiocore.AudioViz()
+    opener = audiocore.AudioFile(events[0].logger)
+    rawAudio = opener.loadAtTime(events[0].coarse_timestamp) # < all share one
+    Fs = 44100
+
+    for event in events:
+        sample_idx = int((event.event_time * Fs))
+        mid_len = int((event.event_length / 2) * Fs)
+        full_audio_sample = rawAudio[sample_idx - mid_len: sample_idx + mid_len, :]
+
+        # directory/ logerid_coarsetimestamp_(?).wav === 7_1528419100_17.wav
+        filename = directory + str(event.logger.logger_id) + "_" + str(event.coarse_timestamp) + "_" + str(int(event.event_time))
+
+        # Save PNG plot
+        fig = plt.figure(figsize=(4, 4*4), dpi=60)
+        fig.suptitle("Event "+str(event.logger.logger_id) + "_" + str(event.coarse_timestamp) + "_" + str(sample_idx)+", SS: "+str(event.SS))
+        # << as a bonus might be useful to mark which window caused this event and what was it's coherence score ...
+
+        viz.plotSpectrogram(full_audio_sample)
+        plt.savefig(filename + ".png")
+        plt.close()
+
+        # Save WAV
+        data = np.asarray(full_audio_sample, dtype=np.float)
+        #print("data.shape", data.shape)
+        wavfile.write(filename + ".wav",Fs,data)
 
 ###
 
 
 ################
-"""
+#"""
 # we create our logger objects and embed them into our world.
 # the size of our world. note that the origin (0,0) is defined by
 # the position of the lower left node
@@ -181,22 +214,54 @@ lon = 29.8797
 targetpos = shumbacore.Position(lat,lon,'LatLong')
 target = shumbacore.Target(0,"KillLoc",targetpos)
 world.addTarget(target)
-"""
 
+"""
 logger_directory = "/home/vitek/Vitek/python_codes/ox_audio_analysis_animals/DATA_BuffaloKillResampled/"
 logger_filepattern =  "{:02d}/hq_{:d}.wav"
 logger8pos = shumbacore.Position(-21.7237,29.8819,'LatLong')
 logger8 = shumbacore.Logger(id=8,name="8",position=logger8pos,directory=logger_directory,filetemplate=logger_filepattern)
+"""
 
 #################
+strong_coherence_threshold = 5.9 # salient events have coherence > this thr
+weak_coherence_threshold = 3.0   # non events have coherence < this thr
 
-plots_directory = "plots/"
+plots_directory = "samples/" # plots/
 mkdir(plots_directory)
+mkdir("samples/")
+events_directory = "samples/events/"
+mkdir(events_directory)
+nonevents_directory = "samples/nonevents/"
+mkdir(nonevents_directory)
 
-# for selected_logger in loggerlist:
-#   for selected_coarse_timestamp in coarse_timestamps:
-selected_logger = logger8
-selected_coarse_timestamp = 1528419100
 
-events, non_events = extract_events_data_from_dataset(selected_logger, selected_coarse_timestamp)
-visualize_events_nonevents(selected_logger, selected_coarse_timestamp, events, non_events, show=False, save=plots_directory)
+total_events = []
+total_non_events = []
+
+#if True:
+#    if True:
+
+for selected_logger in loggerlist:
+    for selected_coarse_timestamp in coarse_timestamps:
+
+        #selected_logger = logger8
+        #selected_coarse_timestamp = 1528419200
+
+        print(">--------- station", selected_logger.logger_id, "@ time", selected_coarse_timestamp, ":")
+        events, non_events = extract_events_data_from_dataset(selected_logger, selected_coarse_timestamp, strong_coherence_threshold, weak_coherence_threshold)
+        visualize_events_nonevents(selected_logger, selected_coarse_timestamp, events, non_events, show=False, save=plots_directory)
+
+        save_audio_samples(events, events_directory)
+        save_audio_samples(non_events, nonevents_directory)
+
+        for e in events: total_events.append(e)
+        for ne in non_events: total_non_events.append(ne)
+
+
+print("------ Final state ------")
+print("We have in total", len(total_events), "salient samples.")
+print("And", len(total_non_events), "samples without events.")
+
+# ------ Final state ------
+# We have in total 105 salient samples.
+# And 268 samples without events.
