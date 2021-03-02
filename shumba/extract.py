@@ -40,6 +40,44 @@ class Event():
             mystr += " Class: " + str(self.classLabel) + "\n"
         return mystr
 
+    def debug_getsnippets(self,window=4096,Fs=44100):
+        # Now we have to load the correlation and lag values from file
+
+        opener = audiocore.AudioFile(self.logger)
+        rawAudio = opener.loadAtTime(self.coarse_timestamp)
+        print("rawAudio.shape",rawAudio.shape)
+
+        beamformer = audiocore.Beamformer(self.logger)
+        beamformed, corr, lags = beamformer.beamformAtTime(self.coarse_timestamp, window)
+
+        # now turn event_time into window offset
+        # we need to add 1 to the windows to get a sensible AoA
+        window_idx = int((self.event_time * Fs) / window)
+        sample_idx = int((self.event_time * Fs))
+
+        mid_len = int((self.event_length / 2) * Fs)
+        snippet = beamformed[sample_idx - mid_len : sample_idx + mid_len]
+        print("DEBUG (range)",sample_idx - mid_len , sample_idx + mid_len)
+        print("snippet.shape",snippet.shape)
+
+        snippet_raw_audio = rawAudio[sample_idx - mid_len : sample_idx + mid_len, :]
+        print("snippet_raw_audio.shape",snippet_raw_audio.shape)
+
+        print("!debug")
+        return snippet, snippet_raw_audio
+
+    def debug_savewav(self, path, window=4096, Fs=44100):
+        import os
+        opener = audiocore.AudioFile(self.logger)
+
+        snippet_beamformed, snippet_raw_audio = self.debug_getsnippets(window, Fs)
+        filename = str(self.logger.logger_id)+"_" +str(self.coarse_timestamp)+path+".wav"
+        opener.save_file(snippet_beamformed,filename,None)
+
+        full_filename = os.path.join(self.logger.directory, filename)
+        print("saved into:", full_filename)
+
+
 class EventCreator():
 
     def __init__(self,window=4096,event_length=5.0,Fs=44100):
