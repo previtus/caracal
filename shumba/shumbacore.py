@@ -16,7 +16,8 @@ import os
 
 
 class Pickler():
-    
+    # Pickler: utility for saving and restoring python data
+
     def __init__(self,parent_directory):
         self.parent_directory = parent_directory
         
@@ -44,6 +45,8 @@ class Pickler():
         return data
 
 class Position():
+    # Position: generic position class, supports LatLong, UTM and XY coordinate types
+
     def __init__(self,coord_h,coord_v,positiontype):
         """positiontype sets the type of position. Can be:
         - 'LatLong'
@@ -92,7 +95,8 @@ class Position():
         return "Position (" + str(x) + ":" + str(y) + ")" 
     
 class Logger():
-    
+    # Logger: logger object and associated directory of data
+
     def __init__(self,id,name,position,directory,filetemplate):
         """ This is a container which holds all the details of a particular logger"""
         self.logger_id = id
@@ -107,7 +111,8 @@ class Logger():
         return "Logger " + str(self.logger_id) + ":" + self.logger_name + ")" 
 
 class Target():
-    
+    # Target: ground truth event at a certain location and/or time
+
     def __init__(self,target_id,target_name,position,target_timestamp=None):
         """ This is a container which holds all the details of a particular target event.
         A target is a surveyed (ground-truthed) event."""
@@ -124,7 +129,8 @@ class Target():
                 " Timestamp: " + str(self.target_timestamp)
             
 class CoordinateTransform():
-    
+    # CoordinateTransform: helper function to convert LatLong to cartesian
+
     def __init__(self):
         """ This class deals with coordinate transformations"""
         self._projections = {}
@@ -172,7 +178,8 @@ class CoordinateTransform():
         return x,y
 
 class World():
-    
+    # World: container for a collection of loggers and targets
+
     def _determineOrigin(self):
         if self.definedOrigin is None:
             # Internal method which is called whenever a new

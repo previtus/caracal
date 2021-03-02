@@ -44,7 +44,7 @@ class PositionInformedDelayBounder():
         posB = loggerB.position
         distance = posA.distance(posB)
         maxTime = distance/self.propagationSpeed
-        #print("distance",distance,"time",maxTime,loggerA.logger_id,loggerB.logger_id)
+        print("distance",distance,"time",maxTime,loggerA.logger_id,loggerB.logger_id)
         return maxTime
 
 ## Dictionary like class/container that contains details of match event
@@ -303,6 +303,8 @@ class EventMatcher():
                                             refFineTime,
                                             refLength+(searchLength*2))
                 #print(referenceFs,candidateFs)
+
+                print("debug", referenceStream.shape,referenceFs, "with", candidateStream.shape,candidateFs)
                 matchDetails = self.matcher.matchStreams(referenceStream,referenceFs,
                                                         candidateStream,candidateFs)
                 if matchDetails is not None:

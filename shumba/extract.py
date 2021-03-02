@@ -220,6 +220,9 @@ class CoherentEventSegmenter():
         lpAudio = util.lowpassFilter(hpAudio,lpcutoff)
         # Extract the mask
         mask = self.createMask(lpAudio)
+
+        #print("mask", mask)
+
         # create events
         events = self.maskToEvents(logger,coarse_timestamp,mask,beamformed,corr,lags)
         return beamformed,events
