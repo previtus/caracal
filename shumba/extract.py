@@ -1,16 +1,3 @@
-#
-#                                _ _     _ 
-#                               (_) |   | |
-#  ___  _ __   ___ _ ____      ___| | __| |
-# / _ \| '_ \ / _ \ '_ \ \ /\ / / | |/ _` |
-#| (_) | |_) |  __/ | | \ V  V /| | | (_| |
-# \___/| .__/ \___|_| |_|\_/\_/ |_|_|\__,_|
-#      | |                                 
-#      |_|                                 
-#
-# part of the openwild project
-
-
 ### Library functions to extract and enhance audio events from a single logger
 # Event: Container for potential events
 # EventSegmenter: multichannel based signal extraction using likelihood of AoA events

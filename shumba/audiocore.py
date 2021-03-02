@@ -1,15 +1,3 @@
-#
-#                                _ _     _ 
-#                               (_) |   | |
-#  ___  _ __   ___ _ ____      ___| | __| |
-# / _ \| '_ \ / _ \ '_ \ \ /\ / / | |/ _` |
-#| (_) | |_) |  __/ | | \ V  V /| | | (_| |
-# \___/| .__/ \___|_| |_|\_/\_/ |_|_|\__,_|
-#      | |                                 
-#      |_|                                 
-#
-# part of the openwild project
-
 ### Core audio functions including:
 
 # AudioFile: file handling - reading and writing wavefiles
