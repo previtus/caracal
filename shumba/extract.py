@@ -45,7 +45,7 @@ class Event():
 
         opener = audiocore.AudioFile(self.logger)
         rawAudio = opener.loadAtTime(self.coarse_timestamp)
-        print("rawAudio.shape",rawAudio.shape)
+        #print("rawAudio.shape",rawAudio.shape)
 
         beamformer = audiocore.Beamformer(self.logger)
         beamformed, corr, lags = beamformer.beamformAtTime(self.coarse_timestamp, window)
@@ -57,13 +57,13 @@ class Event():
 
         mid_len = int((self.event_length / 2) * Fs)
         snippet = beamformed[sample_idx - mid_len : sample_idx + mid_len]
-        print("DEBUG (range)",sample_idx - mid_len , sample_idx + mid_len)
-        print("snippet.shape",snippet.shape)
+        #print("DEBUG (range)",sample_idx - mid_len , sample_idx + mid_len)
+        #print("snippet.shape",snippet.shape)
 
         snippet_raw_audio = rawAudio[sample_idx - mid_len : sample_idx + mid_len, :]
-        print("snippet_raw_audio.shape",snippet_raw_audio.shape)
+        #print("snippet_raw_audio.shape",snippet_raw_audio.shape)
 
-        print("!debug")
+        #print("!debug")
         return snippet, snippet_raw_audio
 
     def debug_savewav(self, path, window=4096, Fs=44100):
