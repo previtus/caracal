@@ -174,14 +174,18 @@ class CoherentEventSegmenter():
     """This class uses the coherence metric (rather than beamforming) to extract 
     events"""
     
-    def __init__(self,window=4096,coherence_window=512,
-                coherence_threshold=5.0,merge=25,event_length=5.0,Fs=44100):
+    def __init__(self,window=4096,coherence_window=512, coherence_threshold=5.0,merge=25,event_length=5.0,Fs=44100, metric_comparison_function_over=None):
         self.window = window
         self.coherence_threshold = coherence_threshold
         self.merge = merge
         self.event_length = event_length
         self.Fs = Fs
         self.coherence_window = coherence_window
+
+        # This way we allow custom comparator functions - for example to select samples with coherence below thr
+        if metric_comparison_function_over is None:
+            metric_comparison_function_over = lambda metric,coherence_thr: metric > coherence_thr
+        self.metric_comparison_function_over = metric_comparison_function_over
 
     def coherenceDetector(self,snippet_quad,window_size=512,fs=44100):
         """
@@ -215,7 +219,9 @@ class CoherentEventSegmenter():
             metric = self.coherenceDetector(snippet,
                             window_size = self.coherence_window,
                             fs = self.Fs)
-            if (metric > self.coherence_threshold):
+
+            #if (metric > self.coherence_threshold): # original check
+            if self.metric_comparison_function_over(metric, self.coherence_threshold):
                 if (merge_counter < 1):
                     mask.append(True)
                     merge_counter = self.merge
