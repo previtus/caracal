@@ -71,7 +71,6 @@ def draw_bboxes_for_events(events, ax, boolean_mask=None, linewidth=2):
 def extract_events_data_from_dataset(logger, coarse_timestamp, strong_coherence_threshold = 5.9, weak_coherence_threshold = 3.0, event_length=4.0, merge = 44):
 
     # Get all positive matches for events ~ "has event"
-    merge = 44 # 40 is close to having no overlap in between two 4 sec events
     bigger_than_coherence = lambda metric, coherence_thr: metric > coherence_thr
 
     ev = extract.CoherentEventSegmenter(coherence_threshold=strong_coherence_threshold,merge=merge,event_length=event_length, metric_comparison_function_over=bigger_than_coherence)
