@@ -10,6 +10,10 @@ import numpy as np
 
 logger_directory = "/home/vitek/Vitek/python_codes/ox_audio_analysis_animals/DATA_BuffaloKillResampled/"
 logger_filepattern =  "{:02d}/hq_{:d}.wav"
+
+logger7pos = shumbacore.Position(-21.7278, 29.8843, 'LatLong')
+logger7 = shumbacore.Logger(id=7, name="7", position=logger7pos, directory=logger_directory, filetemplate=logger_filepattern)
+
 logger8pos = shumbacore.Position(-21.7237,29.8819,'LatLong')
 logger8 = shumbacore.Logger(id=8,name="8",position=logger8pos,directory=logger_directory,filetemplate=logger_filepattern)
 ###---
@@ -48,8 +52,10 @@ class GUIHandler(object):
 
     def update_image(self):
         #### EXECUTE THE CODE:
-        selected_logger = logger8
-        selected_coarse_timestamp = 1528419200
+        #selected_logger = logger8
+        #selected_coarse_timestamp = 1528419200
+        selected_logger = logger7
+        selected_coarse_timestamp = 1528419400
 
         from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
         from matplotlib.figure import Figure

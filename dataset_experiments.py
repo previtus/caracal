@@ -94,6 +94,8 @@ def extract_events_data_from_dataset(logger, coarse_timestamp, strong_coherence_
         t_end_orig = t_start_orig + events[event_i].event_length
         ranges_events.append([t_start_orig,t_end_orig]) # they are also ordered...
 
+    #print("debug - ranges_events:",ranges_events)
+
     for non_event_i in range(len(non_events)): # x1,x2 <?> y1,y2
         x1 = non_events[non_event_i].event_time
         x2 = x1 + non_events[non_event_i].event_length
@@ -104,11 +106,18 @@ def extract_events_data_from_dataset(logger, coarse_timestamp, strong_coherence_
             if is_overlapping(x1,x2,y1,y2): # one overlaping is enough
                 overlapping = True
                 break
-            if y2 > x2: # .. we could also stop early for efficiency here
-                break
+            #if y2 > x2: # .. we could also stop early for efficiency here
+            #    break
+
+        #print("debug - x1,x2, overlapping?:", x1, x2, overlapping)
+
         nonoverlapping_nonevent_flags.append(not overlapping)
 
+    #print("nonoverlapping_nonevent_flags:",nonoverlapping_nonevent_flags)
+
+
     nonoverlapping_non_events = [non_events[i] for i in range(len(non_events)) if nonoverlapping_nonevent_flags[i]]
+    print("And", len(nonoverlapping_non_events), "non-events which weren't overlapping.")
 
     ### Signal Strength filtering
     # non events should have SS < 0.003 # 'looking' at the data (and also > 0.0 to remove errorneous ones)
@@ -119,7 +128,7 @@ def extract_events_data_from_dataset(logger, coarse_timestamp, strong_coherence_
 
 
     print("We got", len(events), "events.")
-    print("And", len(final_non_events), "non-events which weren't overlapping.")
+    print("And finally", len(final_non_events), "non-events with signal strength < 0.003.")
     return events, final_non_events
 
 def visualize_events_nonevents(logger, coarse_timestamp, events, non_events, show=False, save=None, close=True, linewidth = 2):
